@@ -265,7 +265,7 @@
     <button class="done-btn" id="doneBtn">Marcar hoy como hecho</button>
     <div class="progress" aria-hidden="true"><div id="progressBar" style="width:0%"></div></div>
     <div class="progress-meta">
-      <span id="progressText">Día 0 de —</span>
+      <span id="progressText">Día 1 de —</span>
       <span id="goalText">Meta: —</span>
     </div>
   </section>
@@ -391,7 +391,7 @@
     $("unit").textContent = state.habit.toLowerCase();
     $("dateLabel").textContent = dayIdx < 0
       ? `Empieza en ${-dayIdx} día${-dayIdx === 1 ? "" : "s"}`
-      : `Hoy · Día ${dayIdx}`;
+      : `Hoy · Día ${dayIdx + 1}`;
 
     if (dayIdx < 0) {
       $("meta").innerHTML = `Preparate. Vas a empezar con <b>${state.startAmt} ${state.habit.toLowerCase()}</b> el <b>${state.startDate}</b>.`;
@@ -411,7 +411,7 @@
     $("progressBar").style.width = pct + "%";
     $("progressText").textContent = dayIdx < 0
       ? `Sin empezar`
-      : `Día ${dayIdx} de ${goalDay}`;
+      : `Día ${dayIdx + 1} de ${goalDay + 1}`;
     $("goalText").textContent = `Meta: ${state.goal}`;
 
     $("streak").textContent = `${currentStreak()} 🔥`;
