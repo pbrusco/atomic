@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Atomic — daily habit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --bg: #0e1014;
+    --bg-soft: #16191f;
+    --card: #1b1f27;
+    --line: #262b35;
+    --text: #eef1f6;
+    --muted: #8a93a6;
+    --accent: #7c5cff;
+    --accent-2: #21d4a8;
+    --done: #21d4a8;
+    --warn: #ffb454;
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7fb;
+      --bg-soft: #eef0f6;
+      --card: #ffffff;
+      --line: #e6e8ef;
+      --text: #14161c;
+      --muted: #6b7280;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(900px 500px at 90% -10%, rgba(124,92,255,.18), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(33,212,168,.14), transparent 60%),
+      var(--bg);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 28px 20px 64px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .2px; }
+  .brand .dot {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 6px 20px rgba(124,92,255,.35);
+  }
+  .icon-btn {
+    background: transparent; color: var(--muted); border: 1px solid var(--line);
+    width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all .15s ease;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--text); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+
+  .hero { text-align: center; padding: 28px 22px 26px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: -1px;
+    background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(33,212,168,.10));
+    pointer-events: none;
+  }
+  .hero > * { position: relative; }
+  .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; }
+  .target {
+    font-size: clamp(72px, 18vw, 112px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin: 6px 0 4px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .unit { font-size: 18px; color: var(--muted); margin-bottom: 18px; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .meta b { color: var(--text); font-weight: 600; }
+
+  .done-btn {
+    appearance: none; border: 0; cursor: pointer;
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white; font-size: 16px; font-weight: 600; letter-spacing: .2px;
+    box-shadow: 0 8px 24px rgba(124,92,255,.35);
+    transition: transform .08s ease, filter .15s ease;
+  }
+  .done-btn:hover { filter: brightness(1.05); }
+  .done-btn:active { transform: translateY(1px); }
+  .done-btn.done {
+    background: var(--bg-soft); color: var(--done);
+    border: 1px solid var(--done);
+    box-shadow: none;
+  }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .stat .v { font-size: 22px; font-weight: 700; margin-top: 2px; }
+
+  .progress {
+    height: 8px; border-radius: 99px; background: var(--bg-soft); overflow: hidden;
+    margin-top: 14px;
+  }
+  .progress > div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .4s ease;
+  }
+  .progress-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+  details.settings {
+    margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  details.settings > summary {
+    list-style: none; cursor: pointer; padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 600;
+  }
+  details.settings > summary::-webkit-details-marker { display: none; }
+  details.settings > summary .chev { color: var(--muted); transition: transform .2s; }
+  details.settings[open] > summary .chev { transform: rotate(180deg); }
+  details.settings .body { padding: 4px 18px 18px; border-top: 1px solid var(--line); }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .field input {
+    background: var(--bg-soft); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; font-size: 15px; outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .save {
+    margin-top: 14px; width: 100%; padding: 12px;
+    background: var(--text); color: var(--bg); border: 0;
+    border-radius: 10px; font-weight: 600; cursor: pointer;
+  }
+
+  .recent { margin-top: 18px; padding: 16px 18px; }
+  .recent h3 { margin: 0 0 10px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+  .days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+  .day {
+    aspect-ratio: 1; border-radius: 4px; background: var(--bg-soft);
+    border: 1px solid var(--line);
+  }
+  .day.done { background: var(--done); border-color: var(--done); }
+  .day.today { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .day.future { opacity: .35; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px;
+    font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none;
+    transition: all .25s ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 22px; }
+  a { color: var(--accent); text-decoration: none; }
+
+  @keyframes pop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
+  .pop { animation: pop .3s ease; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="dot"></div><span>Atomic</span></div>
+    <button class="icon-btn" id="resetBtn" title="Reset all data" aria-label="Reset">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    </button>
+  </header>
+
+  <section class="card hero" id="hero">
+    <div class="label" id="dateLabel">Today</div>
+    <div class="target" id="target">—</div>
+    <div class="unit" id="unit">push-ups</div>
+    <div class="meta" id="meta"></div>
+    <button class="done-btn" id="doneBtn">Mark today complete</button>
+    <div class="progress" aria-hidden="true"><div id="progressBar" style="width:0%"></div></div>
+    <div class="progress-meta">
+      <span id="progressText">Day 0 of —</span>
+      <span id="goalText">Goal: —</span>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="stat"><div class="k">Streak</div><div class="v" id="streak">0 🔥</div></div>
+    <div class="stat"><div class="k">Total done</div><div class="v" id="total">0</div></div>
+  </div>
+
+  <div class="card recent">
+    <h3>Last 14 days</h3>
+    <div class="days" id="days"></div>
+  </div>
+
+  <details class="settings" id="settings">
+    <summary>
+      <span>Settings</span>
+      <span class="chev">▾</span>
+    </summary>
+    <div class="body">
+      <div class="field full">
+        <label for="habit">Habit name</label>
+        <input id="habit" type="text" placeholder="e.g. Push-ups" />
+      </div>
+      <div class="field full">
+        <label for="startDate">Start date</label>
+        <input id="startDate" type="date" />
+      </div>
+      <div class="row">
+        <div class="field"><label for="startAmt">Start amount</label><input id="startAmt" type="number" min="0" /></div>
+        <div class="field"><label for="goal">Goal</label><input id="goal" type="number" min="1" /></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="increment">Increment by</label><input id="increment" type="number" min="1" /></div>
+        <div class="field"><label for="everyDays">Every (days)</label><input id="everyDays" type="number" min="1" /></div>
+      </div>
+      <button class="save" id="saveBtn">Save settings</button>
+    </div>
+  </details>
+
+  <footer>Saves locally to your browser. No accounts, no servers.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const KEY = "atomic-habit-v1";
+  const DEFAULTS = {
+    habit: "Push-ups",
+    startDate: todayISO(),
+    startAmt: 3,
+    increment: 1,
+    everyDays: 2,
+    goal: 50,
+    completed: {} // { "YYYY-MM-DD": true }
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  function todayISO(d = new Date()) {
+    const tz = d.getTimezoneOffset() * 60000;
+    return new Date(d - tz).toISOString().slice(0, 10);
+  }
+  function daysBetween(a, b) {
+    const ad = new Date(a + "T00:00:00");
+    const bd = new Date(b + "T00:00:00");
+    return Math.round((bd - ad) / 86400000);
+  }
+  function targetForDay(s, dayIdx) {
+    if (dayIdx < 0) return null;
+    const v = s.startAmt + Math.floor(dayIdx / s.everyDays) * s.increment;
+    return Math.min(v, s.goal);
+  }
+  function dayReachingGoal(s) {
+    if (s.goal <= s.startAmt) return 0;
+    const stepsNeeded = Math.ceil((s.goal - s.startAmt) / s.increment);
+    return stepsNeeded * s.everyDays;
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+    } catch { return { ...DEFAULTS }; }
+  }
+  function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._h);
+    toast._h = setTimeout(() => t.classList.remove("show"), 1600);
+  }
+
+  let state = load();
+
+  function render() {
+    const today = todayISO();
+    const dayIdx = daysBetween(state.startDate, today);
+    const target = dayIdx < 0 ? state.startAmt : targetForDay(state, dayIdx);
+    const goalDay = dayReachingGoal(state);
+
+    $("target").textContent = target ?? "—";
+    $("unit").textContent = state.habit.toLowerCase();
+    $("dateLabel").textContent = dayIdx < 0
+      ? `Starts in ${-dayIdx} day${-dayIdx === 1 ? "" : "s"}`
+      : `Today · Day ${dayIdx}`;
+
+    if (dayIdx < 0) {
+      $("meta").innerHTML = `Get ready. You'll start with <b>${state.startAmt} ${state.habit.toLowerCase()}</b> on <b>${state.startDate}</b>.`;
+    } else if (target >= state.goal) {
+      $("meta").innerHTML = `You've reached the goal of <b>${state.goal}</b>. Hold the line. 🎯`;
+    } else {
+      const nextBumpIn = state.everyDays - (dayIdx % state.everyDays) - 1 + 1;
+      $("meta").innerHTML = `Next bump to <b>${target + state.increment}</b> in <b>${nextBumpIn} day${nextBumpIn === 1 ? "" : "s"}</b>.`;
+    }
+
+    const isDone = !!state.completed[today];
+    const btn = $("doneBtn");
+    btn.textContent = isDone ? "✓ Done for today" : `Mark today complete`;
+    btn.classList.toggle("done", isDone);
+
+    const pct = goalDay > 0 ? Math.min(100, Math.max(0, (Math.max(dayIdx, 0) / goalDay) * 100)) : 100;
+    $("progressBar").style.width = pct + "%";
+    $("progressText").textContent = dayIdx < 0
+      ? `Not started`
+      : `Day ${dayIdx} of ${goalDay}`;
+    $("goalText").textContent = `Goal: ${state.goal}`;
+
+    $("streak").textContent = `${currentStreak()} 🔥`;
+    $("total").textContent = Object.keys(state.completed).filter(k => state.completed[k]).length;
+
+    renderDays(dayIdx);
+
+    $("habit").value = state.habit;
+    $("startDate").value = state.startDate;
+    $("startAmt").value = state.startAmt;
+    $("increment").value = state.increment;
+    $("everyDays").value = state.everyDays;
+    $("goal").value = state.goal;
+  }
+
+  function currentStreak() {
+    let n = 0;
+    const d = new Date();
+    while (true) {
+      const k = todayISO(d);
+      if (state.completed[k]) { n++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    return n;
+  }
+
+  function renderDays(todayIdx) {
+    const root = $("days");
+    root.innerHTML = "";
+    const today = new Date();
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const k = todayISO(d);
+      const idx = daysBetween(state.startDate, k);
+      const el = document.createElement("div");
+      el.className = "day";
+      if (state.completed[k]) el.classList.add("done");
+      if (i === 0) el.classList.add("today");
+      if (idx < 0) el.classList.add("future");
+      const t = idx < 0 ? "—" : targetForDay(state, idx);
+      el.title = `${k} · target ${t}${state.completed[k] ? " · done" : ""}`;
+      root.appendChild(el);
+    }
+  }
+
+  $("doneBtn").addEventListener("click", () => {
+    const k = todayISO();
+    state.completed[k] = !state.completed[k];
+    save(state);
+    const btn = $("doneBtn");
+    btn.classList.add("pop");
+    setTimeout(() => btn.classList.remove("pop"), 300);
+    toast(state.completed[k] ? "Nice. Logged." : "Unmarked.");
+    render();
+  });
+
+  $("saveBtn").addEventListener("click", () => {
+    const next = {
+      ...state,
+      habit: $("habit").value.trim() || "Habit",
+      startDate: $("startDate").value || todayISO(),
+      startAmt: Math.max(0, parseInt($("startAmt").value, 10) || 0),
+      increment: Math.max(1, parseInt($("increment").value, 10) || 1),
+      everyDays: Math.max(1, parseInt($("everyDays").value, 10) || 1),
+      goal: Math.max(1, parseInt($("goal").value, 10) || 1),
+    };
+    state = next;
+    save(state);
+    toast("Settings saved");
+    $("settings").open = false;
+    render();
+  });
+
+  $("resetBtn").addEventListener("click", () => {
+    if (!confirm("Reset all data and settings?")) return;
+    localStorage.removeItem(KEY);
+    state = load();
+    save(state);
+    toast("Reset");
+    render();
+  });
+
+  // First-run: open settings if no data saved yet
+  if (!localStorage.getItem(KEY)) {
+    save(state);
+    document.getElementById("settings").open = true;
+  }
+
+  render();
+</script>
+</body>
+</html>
