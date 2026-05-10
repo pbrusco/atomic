@@ -163,7 +163,27 @@
   }
   .day.done { background: var(--done); border-color: var(--done); }
   .day.today { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .day.future { opacity: .35; }
+  .day.future { opacity: .35; pointer-events: none; }
+  .day:not(.future) { cursor: pointer; transition: transform .08s ease; }
+  .day:not(.future):hover { transform: scale(1.15); }
+
+  .recent .hint { color: var(--muted); font-size: 11px; margin-top: 8px; }
+
+  textarea {
+    width: 100%; min-height: 120px;
+    background: var(--bg-soft); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    resize: vertical; outline: none;
+  }
+  textarea:focus { border-color: var(--accent); }
+  .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-row button {
+    flex: 1; padding: 10px; border-radius: 10px;
+    background: var(--bg-soft); color: var(--text);
+    border: 1px solid var(--line); cursor: pointer; font-weight: 500;
+  }
+  .btn-row button:hover { border-color: var(--text); }
 
   .toast {
     position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
@@ -210,6 +230,7 @@
   <div class="card recent">
     <h3>Last 14 days</h3>
     <div class="days" id="days"></div>
+    <div class="hint">Tap a day to toggle it — useful if you forgot to log one or lost your data.</div>
   </div>
 
   <details class="settings" id="settings">
@@ -235,6 +256,15 @@
         <div class="field"><label for="everyDays">Every (days)</label><input id="everyDays" type="number" min="1" /></div>
       </div>
       <button class="save" id="saveBtn">Save settings</button>
+
+      <div class="field full" style="margin-top: 22px;">
+        <label>Backup / restore progress</label>
+        <textarea id="backup" placeholder="Paste a backup here to restore"></textarea>
+        <div class="btn-row">
+          <button type="button" id="copyBtn">Copy backup</button>
+          <button type="button" id="restoreBtn">Restore from text</button>
+        </div>
+      </div>
     </div>
   </details>
 
@@ -338,6 +368,9 @@
     $("increment").value = state.increment;
     $("everyDays").value = state.everyDays;
     $("goal").value = state.goal;
+    if (document.activeElement !== $("backup")) {
+      $("backup").value = JSON.stringify(state, null, 2);
+    }
   }
 
   function currentStreak() {
@@ -366,7 +399,15 @@
       if (i === 0) el.classList.add("today");
       if (idx < 0) el.classList.add("future");
       const t = idx < 0 ? "—" : targetForDay(state, idx);
-      el.title = `${k} · target ${t}${state.completed[k] ? " · done" : ""}`;
+      el.title = `${k} · target ${t}${state.completed[k] ? " · done" : ""} · click to toggle`;
+      el.dataset.date = k;
+      el.addEventListener("click", () => {
+        if (idx < 0) return;
+        state.completed[k] = !state.completed[k];
+        save(state);
+        toast(state.completed[k] ? `Logged ${k}` : `Unlogged ${k}`);
+        render();
+      });
       root.appendChild(el);
     }
   }
@@ -396,6 +437,34 @@
     save(state);
     toast("Settings saved");
     $("settings").open = false;
+    render();
+  });
+
+  $("copyBtn").addEventListener("click", async () => {
+    const text = JSON.stringify(state, null, 2);
+    $("backup").value = text;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Backup copied to clipboard");
+    } catch {
+      $("backup").select();
+      toast("Backup ready — copy it manually");
+    }
+  });
+
+  $("restoreBtn").addEventListener("click", () => {
+    const raw = $("backup").value.trim();
+    if (!raw) { toast("Paste a backup first"); return; }
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch { toast("Invalid backup — not JSON"); return; }
+    if (typeof parsed !== "object" || !parsed.startDate) {
+      toast("Invalid backup format"); return;
+    }
+    if (!confirm("Replace your current data with this backup?")) return;
+    state = { ...DEFAULTS, ...parsed, completed: parsed.completed || {} };
+    save(state);
+    toast("Restored");
     render();
   });
 
