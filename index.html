@@ -9,7 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
 <title>Atomic — hábito diario</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
 <style>
   :root {
     --bg: #0e1014;
@@ -246,6 +248,53 @@
 
   @keyframes pop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
   .pop { animation: pop .3s ease; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; z-index: 50;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    width: 100%; max-width: 460px; max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+  .modal h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.3px; }
+  .modal p.lead { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  @media (max-width: 380px) { .presets { grid-template-columns: 1fr; } }
+  .preset {
+    text-align: left; padding: 12px 14px;
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 12px; color: var(--text); cursor: pointer;
+    font-size: 14px; transition: border-color .15s, transform .08s;
+    touch-action: manipulation;
+  }
+  .preset:hover { border-color: var(--accent); }
+  .preset:active { transform: translateY(1px); }
+  .preset.selected { border-color: var(--accent); background: rgba(124,92,255,.08); }
+  .preset .name { font-weight: 600; display: block; }
+  .preset .desc { color: var(--muted); font-size: 12px; margin-top: 2px; display: block; }
+  .modal .divider { height: 1px; background: var(--line); margin: 14px 0; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .modal-actions button { flex: 1; min-height: 48px; }
+  .btn-primary {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white; box-shadow: 0 8px 24px rgba(124,92,255,.35);
+    touch-action: manipulation;
+  }
+  .btn-secondary {
+    appearance: none; cursor: pointer;
+    padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 500;
+    background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+    touch-action: manipulation;
+  }
 </style>
 </head>
 <body>
@@ -326,6 +375,42 @@
   </details>
 
   <footer>Se guarda localmente en tu navegador. Sin cuentas ni servidores.</footer>
+</div>
+
+<div class="modal-backdrop" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="modal">
+    <h2 id="welcomeTitle">¡Bienvenido a Atomic! ⚡</h2>
+    <p class="lead">Elegí cualquier hábito que quieras construir poco a poco. Empezás con una cantidad chica y el objetivo crece cada pocos días, hasta llegar a tu meta.</p>
+    <div class="presets" id="presets">
+      <button type="button" class="preset" data-habit="Flexiones" data-start="3" data-goal="50" data-inc="1" data-every="2">
+        <span class="name">Flexiones</span><span class="desc">3 → 50, +1 cada 2 días</span>
+      </button>
+      <button type="button" class="preset" data-habit="Sentadillas" data-start="5" data-goal="100" data-inc="2" data-every="2">
+        <span class="name">Sentadillas</span><span class="desc">5 → 100, +2 cada 2 días</span>
+      </button>
+      <button type="button" class="preset" data-habit="Minutos de meditación" data-start="2" data-goal="20" data-inc="1" data-every="3">
+        <span class="name">Meditar</span><span class="desc">2 → 20 min, +1 cada 3 días</span>
+      </button>
+      <button type="button" class="preset" data-habit="Páginas leídas" data-start="5" data-goal="40" data-inc="1" data-every="2">
+        <span class="name">Leer</span><span class="desc">5 → 40 pág., +1 cada 2 días</span>
+      </button>
+      <button type="button" class="preset" data-habit="Minutos de caminata" data-start="10" data-goal="60" data-inc="2" data-every="2">
+        <span class="name">Caminar</span><span class="desc">10 → 60 min, +2 cada 2 días</span>
+      </button>
+      <button type="button" class="preset" data-habit="Vasos de agua" data-start="2" data-goal="8" data-inc="1" data-every="3">
+        <span class="name">Tomar agua</span><span class="desc">2 → 8 vasos, +1 cada 3 días</span>
+      </button>
+    </div>
+    <div class="divider"></div>
+    <div class="field full" style="margin: 0;">
+      <label for="welcomeHabit">…o escribí el tuyo</label>
+      <input id="welcomeHabit" type="text" placeholder="ej. Abdominales, Estudiar inglés…" />
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="welcomeCustom">Ajustar detalles</button>
+      <button type="button" class="btn-primary" id="welcomeStart">Empezar</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -577,10 +662,78 @@
     render();
   });
 
-  // First-run: open settings if no data saved yet
+  // Welcome modal
+  const welcome = $("welcome");
+  let selectedPreset = null;
+  function openWelcome() {
+    welcome.classList.add("show");
+    $("welcomeHabit").value = "";
+    selectedPreset = null;
+    document.querySelectorAll(".preset").forEach(p => p.classList.remove("selected"));
+    document.querySelector(".preset[data-habit='Flexiones']")?.classList.add("selected");
+    selectedPreset = document.querySelector(".preset.selected");
+  }
+  function closeWelcome() { welcome.classList.remove("show"); }
+
+  document.querySelectorAll(".preset").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".preset").forEach(p => p.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedPreset = btn;
+      $("welcomeHabit").value = "";
+    });
+  });
+  $("welcomeHabit").addEventListener("input", () => {
+    if ($("welcomeHabit").value.trim()) {
+      document.querySelectorAll(".preset").forEach(p => p.classList.remove("selected"));
+      selectedPreset = null;
+    }
+  });
+  function applyWelcomeChoice() {
+    const customName = $("welcomeHabit").value.trim();
+    if (customName) {
+      state = { ...state, habit: customName, startDate: todayISO() };
+    } else if (selectedPreset) {
+      const d = selectedPreset.dataset;
+      state = {
+        ...state,
+        habit: d.habit,
+        startAmt: parseInt(d.start, 10),
+        goal: parseInt(d.goal, 10),
+        increment: parseInt(d.inc, 10),
+        everyDays: parseInt(d.every, 10),
+        startDate: todayISO(),
+      };
+    } else {
+      state = { ...state, startDate: todayISO() };
+    }
+    save(state);
+  }
+  $("welcomeStart").addEventListener("click", () => {
+    applyWelcomeChoice();
+    closeWelcome();
+    render();
+    toast("¡A construir el hábito!");
+  });
+  $("welcomeCustom").addEventListener("click", () => {
+    applyWelcomeChoice();
+    closeWelcome();
+    $("settings").open = true;
+    render();
+    $("settings").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // First-run: show welcome modal
   if (!localStorage.getItem(KEY)) {
     save(state);
-    document.getElementById("settings").open = true;
+    openWelcome();
+  }
+
+  // Register service worker (PWA install on Android)
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
   }
 
   render();

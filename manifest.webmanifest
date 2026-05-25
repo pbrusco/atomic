@@ -1,0 +1,16 @@
+{
+  "name": "Atomic — hábito diario",
+  "short_name": "Atomic",
+  "description": "Seguimiento simple de un hábito atómico que crece cada pocos días.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "lang": "es",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
