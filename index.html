@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
-<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -12,338 +12,610 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0e1014;
-    --bg-soft: #16191f;
-    --card: #1b1f27;
-    --line: #262b35;
-    --text: #eef1f6;
-    --muted: #8a93a6;
-    --accent: #7c5cff;
-    --accent-2: #21d4a8;
-    --done: #21d4a8;
-    --warn: #ffb454;
-    --radius: 16px;
+    --bg: #faf9f6;
+    --bg-grad-1: #f5efe6;
+    --bg-grad-2: #e8eef1;
+    --surface: #ffffff;
+    --surface-2: #f4f3ef;
+    --ink: #0e0f10;
+    --ink-2: #2a2c2f;
+    --muted: #8a8d93;
+    --faint: #b8bbc1;
+    --border: #ececea;
+    --accent: #1f7a4d;
+    --accent-2: #2fa56a;
+    --accent-soft: #e6f4ec;
+    --accent-tint: rgba(31, 122, 77, .08);
+    --shadow-sm: 0 1px 2px rgba(14,15,16,.04), 0 1px 1px rgba(14,15,16,.02);
+    --shadow-md: 0 4px 14px rgba(14,15,16,.06), 0 1px 3px rgba(14,15,16,.04);
+    --shadow-lg: 0 18px 40px rgba(14,15,16,.10), 0 4px 12px rgba(14,15,16,.05);
+    --radius: 22px;
+    --radius-sm: 14px;
+    --radius-xs: 10px;
+    --font: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
-  @media (prefers-color-scheme: light) {
+  @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #f6f7fb;
-      --bg-soft: #eef0f6;
-      --card: #ffffff;
-      --line: #e6e8ef;
-      --text: #14161c;
-      --muted: #6b7280;
+      --bg: #0a0a0a;
+      --bg-grad-1: #131310;
+      --bg-grad-2: #0d1314;
+      --surface: #161616;
+      --surface-2: #1d1d1d;
+      --ink: #f5f5f4;
+      --ink-2: #d4d4d2;
+      --muted: #8a8a86;
+      --faint: #4a4a47;
+      --border: #242422;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --accent-soft: #11281d;
+      --accent-tint: rgba(52,211,153,.10);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+      --shadow-md: 0 4px 14px rgba(0,0,0,.4);
+      --shadow-lg: 0 18px 40px rgba(0,0,0,.5);
     }
   }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; overscroll-behavior-y: none; }
   body {
-    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
-    color: var(--text);
-    background:
-      radial-gradient(900px 500px at 90% -10%, rgba(124,92,255,.18), transparent 60%),
-      radial-gradient(700px 500px at -10% 110%, rgba(33,212,168,.14), transparent 60%),
-      var(--bg);
+    font-family: var(--font);
+    font-size: 15px; line-height: 1.5;
+    color: var(--ink);
+    background: var(--bg);
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
-    text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    text-size-adjust: 100%; -webkit-text-size-adjust: 100%;
+    font-feature-settings: "ss01", "cv11";
   }
+  /* soft ambient color wash, only on light */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(720px 480px at 110% -10%, var(--bg-grad-1), transparent 60%),
+      radial-gradient(620px 420px at -20% 110%, var(--bg-grad-2), transparent 55%);
+    opacity: .9;
+  }
+
   .wrap {
-    max-width: 560px; margin: 0 auto;
+    position: relative; z-index: 1;
+    max-width: 520px; margin: 0 auto;
     padding:
-      calc(24px + env(safe-area-inset-top))
-      calc(20px + env(safe-area-inset-right))
-      calc(48px + env(safe-area-inset-bottom))
-      calc(20px + env(safe-area-inset-left));
+      calc(20px + env(safe-area-inset-top))
+      20px
+      calc(40px + env(safe-area-inset-bottom))
+      20px;
   }
-  @media (max-width: 380px) {
-    .wrap { padding-left: calc(16px + env(safe-area-inset-left)); padding-right: calc(16px + env(safe-area-inset-right)); }
-  }
-  header {
+
+  /* ——— Topbar ——— */
+  .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .2px; }
-  .brand .dot {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 6px 20px rgba(124,92,255,.35);
+  .wordmark {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600; font-size: 17px; letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .wordmark .glyph {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: var(--ink); color: var(--bg);
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
   }
   .icon-btn {
-    background: transparent; color: var(--muted); border: 1px solid var(--line);
-    width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-    transition: all .15s ease;
+    appearance: none; border: 0; cursor: pointer;
+    width: 38px; height: 38px; border-radius: 12px;
+    background: transparent; color: var(--muted);
+    display: inline-grid; place-items: center;
+    transition: background .15s, color .15s;
   }
-  .icon-btn:hover { color: var(--text); border-color: var(--text); }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .icon-btn:active { transform: scale(.96); }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--line);
+  /* ——— Hero card ——— */
+  .hero {
+    background: var(--surface);
     border-radius: var(--radius);
-    padding: 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    padding: 26px 22px 22px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .hero .label {
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    letter-spacing: .01em; margin-bottom: 16px;
   }
 
-  .hero { text-align: center; padding: 28px 22px 26px; position: relative; overflow: hidden; }
-  .hero::before {
-    content: ""; position: absolute; inset: -1px;
-    background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(33,212,168,.10));
-    pointer-events: none;
+  /* progress ring + center number */
+  .ring-wrap {
+    position: relative;
+    width: clamp(220px, 62vw, 280px);
+    aspect-ratio: 1;
+    margin: 0 auto 14px;
   }
-  .hero > * { position: relative; }
-  .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; }
-  .target {
-    font-size: clamp(72px, 18vw, 112px);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -2px;
-    margin: 6px 0 4px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-wrap circle { fill: none; }
+  .ring-track { stroke: var(--border); stroke-width: 6; }
+  .ring-fill {
+    stroke: var(--accent);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1);
+    filter: drop-shadow(0 2px 6px var(--accent-tint));
   }
-  .unit { font-size: 18px; color: var(--muted); margin-bottom: 18px; }
-  .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-  .meta b { color: var(--text); font-weight: 600; }
+  .ring-center {
+    position: absolute; inset: 0;
+    display: grid; place-items: center; gap: 2px;
+    grid-auto-flow: row;
+  }
+  .ring-center .target {
+    font-size: clamp(72px, 19vw, 96px);
+    font-weight: 600; letter-spacing: -.04em;
+    color: var(--ink); line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: color .25s, transform .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .ring-center .target.bumped { color: var(--accent); }
+  .ring-center .unit {
+    color: var(--muted); font-size: 14px; font-weight: 500;
+    margin-top: 4px; max-width: 70%;
+    text-align: center; line-height: 1.2;
+  }
+
+  .meta { color: var(--ink-2); font-size: 14.5px; margin: 6px auto 18px; max-width: 36ch; }
+  .meta b { color: var(--ink); font-weight: 600; }
 
   .done-btn {
     appearance: none; border: 0; cursor: pointer;
-    width: 100%; padding: 16px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: white; font-size: 16px; font-weight: 600; letter-spacing: .2px;
-    box-shadow: 0 8px 24px rgba(124,92,255,.35);
-    transition: transform .08s ease, filter .15s ease;
-    user-select: none; -webkit-user-select: none;
+    width: 100%; min-height: 54px;
+    border-radius: 14px;
+    background: var(--ink); color: var(--bg);
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    letter-spacing: -.005em;
+    transition: transform .12s, background .15s, box-shadow .2s;
+    box-shadow: 0 6px 16px rgba(14,15,16,.18);
     touch-action: manipulation;
-    min-height: 52px;
   }
-  .done-btn:hover { filter: brightness(1.05); }
-  .done-btn:active { transform: translateY(1px); }
+  .done-btn:hover { background: var(--accent); box-shadow: 0 8px 20px var(--accent-tint); }
+  .done-btn:active { transform: translateY(1px) scale(.995); }
   .done-btn.done {
-    background: var(--bg-soft); color: var(--done);
-    border: 1px solid var(--done);
-    box-shadow: none;
+    background: var(--accent-soft); color: var(--accent);
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+  }
+  .done-btn.done::before {
+    content: ""; display: inline-block;
+    width: 14px; height: 14px; margin-right: 9px; vertical-align: -2px;
+    background: var(--accent);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
   }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-  .stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-  .stat .v { font-size: 22px; font-weight: 700; margin-top: 2px; }
-
-  .progress {
-    height: 8px; border-radius: 99px; background: var(--bg-soft); overflow: hidden;
+  .progress-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--muted); font-size: 12.5px; font-weight: 500;
     margin-top: 14px;
   }
-  .progress > div {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    transition: width .4s ease;
-  }
-  .progress-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .progress-meta b { color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
 
+  /* ——— Stats ——— */
+  .stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 14px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .stat .ico {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent);
+    flex: 0 0 38px;
+  }
+  .stat .col { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+  .stat .k { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 3px; }
+  .stat .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+  /* ——— Share buttons ——— */
+  .share-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 14px;
+  }
+  .share-btn {
+    appearance: none; cursor: pointer;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 13px 14px;
+    min-height: 50px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s, border-color .15s, background .15s;
+    touch-action: manipulation;
+  }
+  .share-btn:hover { border-color: var(--accent); }
+  .share-btn:active { transform: scale(.98); }
+  .share-btn .wa-ico {
+    width: 18px; height: 18px;
+    color: #25D366;
+    flex: 0 0 18px;
+  }
+
+  /* ——— Recent days ——— */
+  .ledger {
+    margin-top: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+  }
+  .ledger-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .ledger-head h3 {
+    margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+  }
+  .ledger-head .small { font-size: 12px; color: var(--muted); }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day {
+    aspect-ratio: 1; position: relative;
+    background: var(--surface-2);
+    border-radius: 8px;
+    border: 1px solid transparent;
+    touch-action: manipulation;
+    transition: background .15s, transform .12s, border-color .15s;
+  }
+  .day.done {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .day.done::after {
+    content: ""; position: absolute; inset: 0;
+    background: var(--surface);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/45% no-repeat;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/45% no-repeat;
+  }
+  .day.today {
+    box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--surface);
+  }
+  .day.future { opacity: .45; pointer-events: none; }
+  .day:not(.future) { cursor: pointer; }
+  @media (hover: hover) {
+    .day:not(.future):hover { background: var(--border); }
+    .day.done:not(.future):hover { background: var(--accent-2); }
+  }
+  .day:not(.future):active { transform: scale(.88); }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+  /* ——— Settings ——— */
   details.settings {
-    margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    margin-top: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
   }
   details.settings > summary {
-    list-style: none; cursor: pointer; padding: 14px 18px;
+    list-style: none; cursor: pointer;
+    padding: 16px 18px;
     display: flex; align-items: center; justify-content: space-between;
-    font-weight: 600;
+    font-weight: 600; font-size: 15px;
   }
   details.settings > summary::-webkit-details-marker { display: none; }
-  details.settings > summary .chev { color: var(--muted); transition: transform .2s; }
+  details.settings > summary .chev {
+    color: var(--muted); transition: transform .25s ease;
+    display: inline-grid; place-items: center;
+  }
   details.settings[open] > summary .chev { transform: rotate(180deg); }
-  details.settings .body { padding: 4px 18px 18px; border-top: 1px solid var(--line); }
+  details.settings .body {
+    padding: 4px 18px 18px;
+    border-top: 1px solid var(--border);
+  }
 
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .field { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
   .field.full { grid-column: 1 / -1; }
-  .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .field label { font-size: 13px; color: var(--muted); font-weight: 500; }
   .field input {
-    background: var(--bg-soft); color: var(--text);
-    border: 1px solid var(--line); border-radius: 10px;
-    padding: 12px; font-size: 16px; outline: none;
-    transition: border-color .15s;
+    background: var(--surface-2); color: var(--ink);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 12px 14px; font: inherit; font-size: 16px;
+    outline: none; min-height: 46px;
     -webkit-appearance: none; appearance: none;
-    min-height: 44px;
+    transition: border-color .15s, background .15s;
   }
-  .field input:focus { border-color: var(--accent); }
+  .field input:focus { border-color: var(--accent); background: var(--surface); }
+  .field-hint { color: var(--muted); font-size: 12px; }
+  .inline-input { display: flex; align-items: center; gap: 12px; }
+  .inline-input input { flex: 0 0 110px; }
+  .inline-input span { color: var(--muted); font-size: 14px; }
+
+  .preview {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--accent-soft);
+    border-radius: 12px;
+    font-size: 13.5px; color: var(--ink-2); line-height: 1.5;
+  }
+  .preview b { color: var(--ink); font-weight: 600; }
+
   .save {
-    margin-top: 14px; width: 100%; padding: 14px;
-    background: var(--text); color: var(--bg); border: 0;
-    border-radius: 10px; font-weight: 600; cursor: pointer;
-    font-size: 16px; min-height: 48px;
+    margin-top: 16px; width: 100%; padding: 14px;
+    background: var(--ink); color: var(--bg); border: 0;
+    border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600;
+    cursor: pointer; min-height: 50px;
     touch-action: manipulation;
+    transition: background .15s, transform .12s;
   }
-
-  .recent { margin-top: 18px; padding: 16px 18px; }
-  .recent h3 { margin: 0 0 10px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
-  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .day {
-    aspect-ratio: 1; border-radius: 6px; background: var(--bg-soft);
-    border: 1px solid var(--line);
-    touch-action: manipulation;
-  }
-  .day.done { background: var(--done); border-color: var(--done); }
-  .day.today { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .day.future { opacity: .35; pointer-events: none; }
-  .day:not(.future) { cursor: pointer; transition: transform .08s ease; }
-  @media (hover: hover) {
-    .day:not(.future):hover { transform: scale(1.12); }
-  }
-  .day:not(.future):active { transform: scale(.92); }
-
-  .recent .hint { color: var(--muted); font-size: 11px; margin-top: 8px; }
+  .save:hover { background: var(--accent); }
+  .save:active { transform: translateY(1px); }
 
   textarea {
-    width: 100%; min-height: 120px;
-    background: var(--bg-soft); color: var(--text);
-    border: 1px solid var(--line); border-radius: 10px;
-    padding: 10px 12px; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    width: 100%; min-height: 110px;
+    background: var(--surface-2); color: var(--ink);
+    border: 1px solid transparent; border-radius: 12px;
+    padding: 12px 14px;
+    font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
     resize: vertical; outline: none;
   }
   textarea:focus { border-color: var(--accent); }
-  .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; }
   .btn-row button {
-    flex: 1; padding: 12px; border-radius: 10px;
-    background: var(--bg-soft); color: var(--text);
-    border: 1px solid var(--line); cursor: pointer; font-weight: 500;
-    font-size: 14px; min-height: 44px;
+    flex: 1; padding: 12px;
+    background: var(--surface-2); color: var(--ink);
+    border: 1px solid transparent;
+    border-radius: 12px; cursor: pointer; min-height: 44px;
+    font: inherit; font-size: 13.5px; font-weight: 500;
     touch-action: manipulation;
+    transition: background .15s, border-color .15s;
   }
-  textarea { font-size: 13px; min-height: 110px; }
-  .field-hint { color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .inline-input { display: flex; align-items: center; gap: 10px; }
-  .inline-input input { flex: 0 0 110px; }
-  .inline-input span { color: var(--muted); font-size: 14px; }
-  .preview {
-    margin-top: 12px; padding: 12px 14px;
-    background: var(--bg-soft); border: 1px dashed var(--line);
-    border-radius: 10px; font-size: 13px; color: var(--muted);
-    line-height: 1.5;
-  }
-  .preview b { color: var(--text); font-weight: 600; }
-  @media (max-width: 380px) {
-    .btn-row { flex-direction: column; }
-  }
-  .btn-row button:hover { border-color: var(--text); }
+  .btn-row button:hover { border-color: var(--accent); }
+  @media (max-width: 380px) { .btn-row { flex-direction: column; } }
 
+  /* ——— Toast ——— */
   .toast {
-    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+    position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom));
     transform: translateX(-50%) translateY(20px);
-    background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 99px;
-    font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none;
-    transition: all .25s ease;
-    max-width: calc(100vw - 32px);
-    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    background: var(--ink); color: var(--bg);
+    padding: 11px 18px; border-radius: 99px;
+    font-size: 13px; font-weight: 500;
+    opacity: 0; pointer-events: none;
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+    z-index: 100; box-shadow: var(--shadow-md);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 22px; }
-  a { color: var(--accent); text-decoration: none; }
-
-  @keyframes pop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
-  .pop { animation: pop .3s ease; }
-
-  .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(0,0,0,.55);
-    display: none; align-items: center; justify-content: center;
-    padding: 16px; z-index: 50;
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  .footer-note {
+    text-align: center; color: var(--muted);
+    font-size: 12px; margin-top: 24px;
   }
+
+  /* ——— Modal ——— */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(14,15,16,.45);
+    display: none; align-items: flex-end; justify-content: center;
+    padding: 0; z-index: 200;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    animation: fadeIn .25s ease;
+  }
+  @media (min-width: 520px) { .modal-backdrop { align-items: center; padding: 16px; } }
   .modal-backdrop.show { display: flex; }
   .modal {
-    width: 100%; max-width: 460px; max-height: calc(100dvh - 32px);
+    width: 100%; max-width: 480px; max-height: 92dvh;
     overflow-y: auto;
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 24px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    padding: 26px 22px calc(26px + env(safe-area-inset-bottom));
+    box-shadow: var(--shadow-lg);
+    animation: slideUp .35s cubic-bezier(.2,.8,.2,1);
   }
-  .modal h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.3px; }
-  .modal p.lead { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.5; }
-  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  @media (min-width: 520px) {
+    .modal { border-radius: 24px; padding: 28px; animation: pop .3s cubic-bezier(.2,.8,.2,1); }
+  }
+  .modal h2 {
+    margin: 4px 0 6px;
+    font-size: 24px; font-weight: 700; letter-spacing: -.02em;
+  }
+  .modal .lead {
+    margin: 0 0 18px; color: var(--muted); font-size: 14.5px; line-height: 1.55;
+  }
+  .modal .grab {
+    width: 36px; height: 4px; border-radius: 99px;
+    background: var(--border); margin: -8px auto 16px;
+  }
+  @media (min-width: 520px) { .modal .grab { display: none; } }
+
+  .presets {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 14px;
+  }
   @media (max-width: 380px) { .presets { grid-template-columns: 1fr; } }
   .preset {
-    text-align: left; padding: 12px 14px;
-    background: var(--bg-soft); border: 1px solid var(--line);
-    border-radius: 12px; color: var(--text); cursor: pointer;
-    font-size: 14px; transition: border-color .15s, transform .08s;
-    touch-action: manipulation;
+    text-align: left; padding: 14px;
+    background: var(--surface-2); color: var(--ink);
+    border: 1.5px solid transparent;
+    border-radius: 14px; cursor: pointer;
+    transition: border-color .15s, background .15s, transform .12s;
+    touch-action: manipulation; position: relative;
+    font: inherit;
   }
-  .preset:hover { border-color: var(--accent); }
-  .preset:active { transform: translateY(1px); }
-  .preset.selected { border-color: var(--accent); background: rgba(124,92,255,.08); }
-  .preset .name { font-weight: 600; display: block; }
-  .preset .desc { color: var(--muted); font-size: 12px; margin-top: 2px; display: block; }
-  .modal .divider { height: 1px; background: var(--line); margin: 14px 0; }
-  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
-  .modal-actions button { flex: 1; min-height: 48px; }
-  .btn-primary {
+  .preset:hover { border-color: var(--border); }
+  .preset:active { transform: scale(.98); }
+  .preset.selected {
+    border-color: var(--accent); background: var(--accent-soft);
+  }
+  .preset.selected::after {
+    content: ""; position: absolute; top: 10px; right: 10px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/65% no-repeat var(--accent);
+  }
+  .preset .name { font-weight: 600; display: block; font-size: 15px; margin-bottom: 3px; }
+  .preset .desc { color: var(--muted); font-size: 12.5px; display: block; }
+
+  .modal .divider-or {
+    text-align: center; margin: 14px 0 8px;
+    font-size: 12px; color: var(--muted);
+    position: relative;
+  }
+  .modal .divider-or::before, .modal .divider-or::after {
+    content: ""; position: absolute; top: 50%;
+    width: calc(50% - 30px); height: 1px; background: var(--border);
+  }
+  .modal .divider-or::before { left: 0; }
+  .modal .divider-or::after { right: 0; }
+
+  .modal-actions {
+    display: grid; grid-template-columns: 1fr 1.4fr;
+    gap: 8px; margin-top: 20px;
+  }
+  .modal-actions button {
+    min-height: 50px; padding: 14px;
     appearance: none; border: 0; cursor: pointer;
-    padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: white; box-shadow: 0 8px 24px rgba(124,92,255,.35);
+    border-radius: 14px; font: inherit; font-size: 15px; font-weight: 600;
+    transition: background .15s, transform .12s;
     touch-action: manipulation;
   }
-  .btn-secondary {
-    appearance: none; cursor: pointer;
-    padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 500;
-    background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
-    touch-action: manipulation;
+  .modal-actions button:active { transform: scale(.98); }
+  .btn-primary { background: var(--ink); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-secondary { background: var(--surface-2); color: var(--ink); }
+  .btn-secondary:hover { background: var(--border); }
+
+  /* ——— Animations ——— */
+  @keyframes pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  @keyframes tickPop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+  .pop-anim { animation: tickPop .35s cubic-bezier(.2,.8,.2,1); }
+
+  @keyframes ringIn { from { stroke-dashoffset: var(--ring-circ); } }
+  .ring-fill { animation: ringIn .9s .15s cubic-bezier(.2,.8,.2,1) backwards; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .hero > * { animation: fadeUp .5s cubic-bezier(.2,.8,.2,1) backwards; }
+  .hero > *:nth-child(1) { animation-delay: .04s; }
+  .hero > *:nth-child(2) { animation-delay: .10s; }
+  .hero > *:nth-child(3) { animation-delay: .16s; }
+  .hero > *:nth-child(4) { animation-delay: .22s; }
+  .hero > *:nth-child(5) { animation-delay: .28s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="brand"><div class="dot"></div><span>Atomic</span></div>
+  <header class="topbar">
+    <div class="wordmark">
+      <span class="glyph">⚡</span>
+      <span>Atomic</span>
+    </div>
     <button class="icon-btn" id="resetBtn" title="Borrar todos los datos" aria-label="Borrar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
     </button>
   </header>
 
-  <section class="card hero" id="hero">
-    <div class="label" id="dateLabel">Hoy</div>
-    <div class="target" id="target">—</div>
-    <div class="unit" id="unit">flexiones</div>
+  <section class="hero">
+    <div class="label" id="dateLabel">Hoy te tocan</div>
+    <div class="ring-wrap" id="ringWrap">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--accent)"/>
+            <stop offset="100%" stop-color="var(--accent-2)"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="60" cy="60" r="54"/>
+        <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54"
+                stroke-dasharray="339.292" stroke-dashoffset="339.292"/>
+      </svg>
+      <div class="ring-center">
+        <div class="target" id="target">—</div>
+        <div class="unit" id="unit">flexiones</div>
+      </div>
+    </div>
     <div class="meta" id="meta"></div>
     <button class="done-btn" id="doneBtn">Marcar hoy como hecho</button>
-    <div class="progress" aria-hidden="true"><div id="progressBar" style="width:0%"></div></div>
     <div class="progress-meta">
-      <span id="progressText">Día 1 de —</span>
-      <span id="goalText">Meta: —</span>
+      <span id="progressText">Día 1 · —</span>
+      <span id="goalText">Meta <b>—</b></span>
     </div>
   </section>
 
-  <div class="grid">
-    <div class="stat"><div class="k">Racha</div><div class="v" id="streak">0 🔥</div></div>
-    <div class="stat"><div class="k">Total hechos</div><div class="v" id="total">0</div></div>
+  <div class="stats">
+    <div class="stat">
+      <div class="ico" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14a8 8 0 0 0 16 0c0-4.16-2-7.87-6.5-13.33zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+      </div>
+      <div class="col">
+        <span class="k">Racha</span>
+        <span class="v" id="streak">0</span>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="ico" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="col">
+        <span class="k">Total hechos</span>
+        <span class="v" id="total">0</span>
+      </div>
+    </div>
   </div>
 
-  <div class="card recent">
-    <h3>Últimos 14 días</h3>
-    <div class="days" id="days"></div>
-    <div class="hint">Tocá un día para marcarlo o desmarcarlo — útil si te olvidaste de registrar uno o perdiste tus datos.</div>
+  <div class="share-row">
+    <button type="button" class="share-btn" id="shareBtn" aria-label="Compartir progreso por WhatsApp">
+      <svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.93 11.93 0 0 0 12.05 0C5.5 0 .18 5.32.18 11.86c0 2.09.55 4.13 1.6 5.93L0 24l6.36-1.67a11.86 11.86 0 0 0 5.69 1.45h.01c6.55 0 11.87-5.32 11.87-11.86 0-3.17-1.24-6.15-3.41-8.44ZM12.06 21.8h-.01a9.93 9.93 0 0 1-5.06-1.38l-.36-.22-3.77.99 1.01-3.67-.24-.38a9.85 9.85 0 0 1-1.52-5.28c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.9 6.99c0 5.45-4.45 9.93-9.83 9.93Zm5.43-7.42c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.17c-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.21-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35Z"/></svg>
+      <span>Compartir progreso</span>
+    </button>
+    <button type="button" class="share-btn" id="shareRoutineBtn" aria-label="Compartir rutina por WhatsApp">
+      <svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.93 11.93 0 0 0 12.05 0C5.5 0 .18 5.32.18 11.86c0 2.09.55 4.13 1.6 5.93L0 24l6.36-1.67a11.86 11.86 0 0 0 5.69 1.45h.01c6.55 0 11.87-5.32 11.87-11.86 0-3.17-1.24-6.15-3.41-8.44ZM12.06 21.8h-.01a9.93 9.93 0 0 1-5.06-1.38l-.36-.22-3.77.99 1.01-3.67-.24-.38a9.85 9.85 0 0 1-1.52-5.28c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.9 6.99c0 5.45-4.45 9.93-9.83 9.93Zm5.43-7.42c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.17c-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.21-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35Z"/></svg>
+      <span>Compartir rutina</span>
+    </button>
   </div>
+
+  <section class="ledger">
+    <div class="ledger-head">
+      <h3>Últimos 14 días</h3>
+      <span class="small">Tocá para corregir</span>
+    </div>
+    <div class="days" id="days"></div>
+    <div class="hint">Útil si te olvidaste de registrar uno.</div>
+  </section>
 
   <details class="settings" id="settings">
     <summary>
       <span>Ajustes</span>
-      <span class="chev">▾</span>
+      <span class="chev">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
     </summary>
     <div class="body">
       <div class="field full">
-        <label for="habit">Nombre del hábito</label>
+        <label for="habit">Hábito</label>
         <input id="habit" type="text" placeholder="ej. Flexiones" />
       </div>
       <div class="field full">
         <label for="startDate">¿Cuándo empezaste?</label>
         <input id="startDate" type="date" />
-        <div class="field-hint">Puede ser una fecha pasada si ya venís en progreso.</div>
+        <div class="field-hint">Puede ser una fecha pasada.</div>
       </div>
       <div class="field full">
         <label for="daysAgo">…o empecé hace</label>
@@ -354,7 +626,7 @@
       </div>
       <div class="preview" id="preview" aria-live="polite"></div>
       <div class="row">
-        <div class="field"><label for="startAmt">Cantidad inicial</label><input id="startAmt" type="number" inputmode="numeric" min="0" /></div>
+        <div class="field"><label for="startAmt">Inicial</label><input id="startAmt" type="number" inputmode="numeric" min="0" /></div>
         <div class="field"><label for="goal">Meta</label><input id="goal" type="number" inputmode="numeric" min="1" /></div>
       </div>
       <div class="row">
@@ -367,47 +639,47 @@
         <label>Copia de seguridad</label>
         <textarea id="backup" placeholder="Pegá una copia acá para restaurar"></textarea>
         <div class="btn-row">
-          <button type="button" id="copyBtn">Copiar copia</button>
-          <button type="button" id="restoreBtn">Restaurar desde texto</button>
+          <button type="button" id="copyBtn">Copiar</button>
+          <button type="button" id="restoreBtn">Restaurar</button>
         </div>
       </div>
     </div>
   </details>
 
-  <footer>Se guarda localmente en tu navegador. Sin cuentas ni servidores.</footer>
+  <div class="footer-note">Se guarda en este dispositivo · sin cuentas</div>
 </div>
 
 <div class="modal-backdrop" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
   <div class="modal">
-    <h2 id="welcomeTitle">¡Bienvenido a Atomic! ⚡</h2>
-    <p class="lead">Elegí cualquier hábito que quieras construir poco a poco. Empezás con una cantidad chica y el objetivo crece cada pocos días, hasta llegar a tu meta.</p>
+    <div class="grab"></div>
+    <h2 id="welcomeTitle">Empezá tu hábito</h2>
+    <p class="lead">Elegí cualquier hábito. Vas a empezar con poco, y el objetivo crece cada pocos días hasta tu meta.</p>
     <div class="presets" id="presets">
       <button type="button" class="preset" data-habit="Flexiones" data-start="3" data-goal="50" data-inc="1" data-every="2">
-        <span class="name">Flexiones</span><span class="desc">3 → 50, +1 cada 2 días</span>
+        <span class="name">Flexiones</span><span class="desc">3 → 50 · +1 cada 2 días</span>
       </button>
       <button type="button" class="preset" data-habit="Sentadillas" data-start="5" data-goal="100" data-inc="2" data-every="2">
-        <span class="name">Sentadillas</span><span class="desc">5 → 100, +2 cada 2 días</span>
+        <span class="name">Sentadillas</span><span class="desc">5 → 100 · +2 cada 2 días</span>
       </button>
       <button type="button" class="preset" data-habit="Minutos de meditación" data-start="2" data-goal="20" data-inc="1" data-every="3">
-        <span class="name">Meditar</span><span class="desc">2 → 20 min, +1 cada 3 días</span>
+        <span class="name">Meditar</span><span class="desc">2 → 20 min · +1 cada 3 días</span>
       </button>
       <button type="button" class="preset" data-habit="Páginas leídas" data-start="5" data-goal="40" data-inc="1" data-every="2">
-        <span class="name">Leer</span><span class="desc">5 → 40 pág., +1 cada 2 días</span>
+        <span class="name">Leer</span><span class="desc">5 → 40 pág · +1 cada 2 días</span>
       </button>
       <button type="button" class="preset" data-habit="Minutos de caminata" data-start="10" data-goal="60" data-inc="2" data-every="2">
-        <span class="name">Caminar</span><span class="desc">10 → 60 min, +2 cada 2 días</span>
+        <span class="name">Caminar</span><span class="desc">10 → 60 min · +2 cada 2 días</span>
       </button>
       <button type="button" class="preset" data-habit="Vasos de agua" data-start="2" data-goal="8" data-inc="1" data-every="3">
-        <span class="name">Tomar agua</span><span class="desc">2 → 8 vasos, +1 cada 3 días</span>
+        <span class="name">Agua</span><span class="desc">2 → 8 vasos · +1 cada 3 días</span>
       </button>
     </div>
-    <div class="divider"></div>
+    <div class="divider-or">o escribí el tuyo</div>
     <div class="field full" style="margin: 0;">
-      <label for="welcomeHabit">…o escribí el tuyo</label>
-      <input id="welcomeHabit" type="text" placeholder="ej. Abdominales, Estudiar inglés…" />
+      <input id="welcomeHabit" type="text" placeholder="ej. Abdominales, estudiar inglés…" />
     </div>
     <div class="modal-actions">
-      <button type="button" class="btn-secondary" id="welcomeCustom">Ajustar detalles</button>
+      <button type="button" class="btn-secondary" id="welcomeCustom">Ajustar</button>
       <button type="button" class="btn-primary" id="welcomeStart">Empezar</button>
     </div>
   </div>
@@ -424,7 +696,7 @@
     increment: 1,
     everyDays: 2,
     goal: 50,
-    completed: {} // { "YYYY-MM-DD": true }
+    completed: {}
   };
 
   const $ = (id) => document.getElementById(id);
@@ -461,10 +733,12 @@
     t.textContent = msg;
     t.classList.add("show");
     clearTimeout(toast._h);
-    toast._h = setTimeout(() => t.classList.remove("show"), 1600);
+    toast._h = setTimeout(() => t.classList.remove("show"), 1800);
   }
 
   let state = load();
+
+  const RING_CIRC = 2 * Math.PI * 54; // ~339.292
 
   function render() {
     const today = todayISO();
@@ -476,10 +750,13 @@
     $("unit").textContent = state.habit.toLowerCase();
     $("dateLabel").textContent = dayIdx < 0
       ? `Empieza en ${-dayIdx} día${-dayIdx === 1 ? "" : "s"}`
-      : `Hoy · Día ${dayIdx + 1}`;
+      : `Hoy te tocan`;
+
+    const isBumpDay = dayIdx >= 0 && dayIdx % state.everyDays === 0 && dayIdx > 0 && target < state.goal;
+    $("target").classList.toggle("bumped", isBumpDay);
 
     if (dayIdx < 0) {
-      $("meta").innerHTML = `Preparate. Vas a empezar con <b>${state.startAmt} ${state.habit.toLowerCase()}</b> el <b>${state.startDate}</b>.`;
+      $("meta").innerHTML = `Empezás con <b>${state.startAmt} ${state.habit.toLowerCase()}</b> el <b>${state.startDate}</b>.`;
     } else if (target >= state.goal) {
       $("meta").innerHTML = `Llegaste a la meta de <b>${state.goal}</b>. Sostenelo. 🎯`;
     } else {
@@ -489,17 +766,21 @@
 
     const isDone = !!state.completed[today];
     const btn = $("doneBtn");
-    btn.textContent = isDone ? "✓ Hecho hoy" : `Marcar hoy como hecho`;
+    btn.textContent = isDone ? "Hecho hoy" : `Marcar hoy como hecho`;
     btn.classList.toggle("done", isDone);
 
-    const pct = goalDay > 0 ? Math.min(100, Math.max(0, (Math.max(dayIdx, 0) / goalDay) * 100)) : 100;
-    $("progressBar").style.width = pct + "%";
-    $("progressText").textContent = dayIdx < 0
-      ? `Sin empezar`
-      : `Día ${dayIdx + 1} de ${goalDay + 1}`;
-    $("goalText").textContent = `Meta: ${state.goal}`;
+    const pct = goalDay > 0 ? Math.min(1, Math.max(0, Math.max(dayIdx, 0) / goalDay)) : 1;
+    const ring = $("ringFill");
+    ring.style.setProperty("--ring-circ", RING_CIRC);
+    ring.style.strokeDasharray = RING_CIRC.toFixed(3);
+    ring.style.strokeDashoffset = (RING_CIRC * (1 - pct)).toFixed(3);
 
-    $("streak").textContent = `${currentStreak()} 🔥`;
+    $("progressText").innerHTML = dayIdx < 0
+      ? `Sin empezar`
+      : `Día <b>${dayIdx + 1}</b> · ${goalDay + 1} en total`;
+    $("goalText").innerHTML = `Meta <b>${state.goal}</b>`;
+
+    $("streak").textContent = currentStreak();
     $("total").textContent = Object.keys(state.completed).filter(k => state.completed[k]).length;
 
     renderDays(dayIdx);
@@ -536,7 +817,7 @@
       const left = Math.max(0, goalDay - dayIdx);
       line = `Hoy te tocan <b>${t}</b> ${habit}. Llegás a la meta en <b>${left}</b> día${left === 1 ? "" : "s"}.`;
     }
-    $("preview").innerHTML = `Vista previa · ${line}`;
+    $("preview").innerHTML = line;
   }
 
   function readSettingsFromForm() {
@@ -591,14 +872,72 @@
     }
   }
 
+  function buildShareMessage() {
+    const today = todayISO();
+    const dayIdx = daysBetween(state.startDate, today);
+    const habit = state.habit.toLowerCase();
+    const streak = currentStreak();
+    const total = Object.keys(state.completed).filter(k => state.completed[k]).length;
+    const target = dayIdx < 0 ? state.startAmt : targetForDay(state, dayIdx);
+    const goalDay = dayReachingGoal(state);
+    const dayLabel = dayIdx < 0 ? `empiezo en ${-dayIdx} día${-dayIdx === 1 ? "" : "s"}` : `día ${dayIdx + 1}`;
+    const lines = [
+      `⚡ Mi progreso con *${state.habit}*`,
+      `📅 ${dayLabel}`,
+      target != null ? `🎯 Hoy: ${target} ${habit}` : null,
+      `🔥 Racha: ${streak} día${streak === 1 ? "" : "s"}`,
+      `✅ Total: ${total}`,
+      target != null && target < state.goal && goalDay > 0
+        ? `🏁 Meta ${state.goal} en ${Math.max(0, goalDay - Math.max(dayIdx, 0))} día${(goalDay - Math.max(dayIdx, 0)) === 1 ? "" : "s"}`
+        : target != null && target >= state.goal ? `🏆 ¡Meta alcanzada!` : null,
+    ].filter(Boolean);
+    return lines.join("\n");
+  }
+
+  const APP_URL = "https://pbrusco.github.io/atomic/";
+
+  function buildRoutineMessage() {
+    const habit = state.habit.toLowerCase();
+    const goalDay = dayReachingGoal(state);
+    const routine = {
+      habit: state.habit,
+      startDate: todayISO(),
+      startAmt: state.startAmt,
+      increment: state.increment,
+      everyDays: state.everyDays,
+      goal: state.goal,
+      completed: {}
+    };
+    const json = JSON.stringify(routine);
+    return [
+      `⚡ Mi rutina en *Atomic*: *${state.habit}*`,
+      `Empezás con *${state.startAmt}* ${habit} y sumás *+${state.increment}* cada *${state.everyDays}* día${state.everyDays === 1 ? "" : "s"}, hasta llegar a *${state.goal}* en ${goalDay} días.`,
+      ``,
+      `¿Querés seguirla?`,
+      `1) Abrí ${APP_URL}`,
+      `2) Andá a *Ajustes → Copia de seguridad*`,
+      `3) Pegá esto y tocá *Restaurar*:`,
+      ``,
+      json
+    ].join("\n");
+  }
+
+  function openWhatsApp(text) {
+    const url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(url, "_blank", "noopener");
+  }
+
+  $("shareBtn").addEventListener("click", () => openWhatsApp(buildShareMessage()));
+  $("shareRoutineBtn").addEventListener("click", () => openWhatsApp(buildRoutineMessage()));
+
   $("doneBtn").addEventListener("click", () => {
     const k = todayISO();
     state.completed[k] = !state.completed[k];
     save(state);
     const btn = $("doneBtn");
-    btn.classList.add("pop");
-    setTimeout(() => btn.classList.remove("pop"), 300);
-    toast(state.completed[k] ? "¡Listo! Registrado." : "Desmarcado.");
+    btn.classList.add("pop-anim");
+    setTimeout(() => btn.classList.remove("pop-anim"), 350);
+    toast(state.completed[k] ? "¡Listo!" : "Desmarcado");
     render();
   });
 
@@ -611,7 +950,6 @@
     render();
   });
 
-  // Sync "days ago" → start date and vice versa
   $("daysAgo").addEventListener("input", () => {
     const n = parseInt($("daysAgo").value, 10);
     if (isNaN(n) || n < 0) return;
@@ -630,10 +968,10 @@
     $("backup").value = text;
     try {
       await navigator.clipboard.writeText(text);
-      toast("Copia guardada en el portapapeles");
+      toast("Copia en el portapapeles");
     } catch {
       $("backup").select();
-      toast("Copia lista — copiala a mano");
+      toast("Copiala a mano");
     }
   });
 
@@ -642,9 +980,9 @@
     if (!raw) { toast("Pegá una copia primero"); return; }
     let parsed;
     try { parsed = JSON.parse(raw); }
-    catch { toast("Copia inválida — no es JSON"); return; }
+    catch { toast("No es JSON válido"); return; }
     if (typeof parsed !== "object" || !parsed.startDate) {
-      toast("Formato de copia inválido"); return;
+      toast("Formato inválido"); return;
     }
     if (!confirm("¿Reemplazar tus datos con esta copia?")) return;
     state = { ...DEFAULTS, ...parsed, completed: parsed.completed || {} };
@@ -670,8 +1008,8 @@
     $("welcomeHabit").value = "";
     selectedPreset = null;
     document.querySelectorAll(".preset").forEach(p => p.classList.remove("selected"));
-    document.querySelector(".preset[data-habit='Flexiones']")?.classList.add("selected");
-    selectedPreset = document.querySelector(".preset.selected");
+    const first = document.querySelector(".preset[data-habit='Flexiones']");
+    if (first) { first.classList.add("selected"); selectedPreset = first; }
   }
   function closeWelcome() { welcome.classList.remove("show"); }
 
@@ -713,7 +1051,7 @@
     applyWelcomeChoice();
     closeWelcome();
     render();
-    toast("¡A construir el hábito!");
+    toast("A construir el hábito");
   });
   $("welcomeCustom").addEventListener("click", () => {
     applyWelcomeChoice();
@@ -723,13 +1061,11 @@
     $("settings").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // First-run: show welcome modal
   if (!localStorage.getItem(KEY)) {
     save(state);
     openWelcome();
   }
 
-  // Register service worker (PWA install on Android)
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js").catch(() => {});
