@@ -836,10 +836,12 @@
   function currentStreak() {
     let n = 0;
     const d = new Date();
-    while (true) {
-      const k = todayISO(d);
-      if (state.completed[k]) { n++; d.setDate(d.getDate() - 1); }
-      else break;
+    // Don't break the streak just because today isn't done yet:
+    // if today is unmarked, start counting from yesterday.
+    if (!state.completed[todayISO(d)]) d.setDate(d.getDate() - 1);
+    while (state.completed[todayISO(d)]) {
+      n++;
+      d.setDate(d.getDate() - 1);
     }
     return n;
   }
