@@ -118,6 +118,20 @@
   }
   .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
   .icon-btn:active { transform: scale(.96); }
+  .topbar-actions { display: flex; align-items: center; gap: 6px; }
+  .install-btn {
+    appearance: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 38px; padding: 0 14px; border-radius: 12px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid transparent;
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    transition: transform .12s, background .15s;
+    touch-action: manipulation;
+  }
+  .install-btn:hover { background: var(--accent); color: #fff; }
+  .install-btn:active { transform: scale(.96); }
+  .install-btn[hidden] { display: none; }
 
   /* ——— Hero card ——— */
   .hero {
@@ -527,9 +541,15 @@
       <span class="glyph">⚡</span>
       <span>Atomic</span>
     </div>
-    <button class="icon-btn" id="resetBtn" title="Borrar todos los datos" aria-label="Borrar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-    </button>
+    <div class="topbar-actions">
+      <button class="install-btn" id="installBtn" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 21h14"/></svg>
+        <span>Instalar</span>
+      </button>
+      <button class="icon-btn" id="resetBtn" title="Borrar todos los datos" aria-label="Borrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      </button>
+    </div>
   </header>
 
   <section class="hero">
@@ -1073,6 +1093,47 @@
       navigator.serviceWorker.register("sw.js").catch(() => {});
     });
   }
+
+  // ——— Install (PWA) ———
+  const installBtn = $("installBtn");
+  let deferredPrompt = null;
+
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+    || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    && !/crios|fxios/i.test(navigator.userAgent);
+
+  // Android/desktop Chromium: capture the real install prompt.
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone) installBtn.hidden = false;
+  });
+
+  // iOS Safari has no programmatic prompt — show a manual hint instead.
+  if (isIOS && !isStandalone) {
+    installBtn.hidden = false;
+    installBtn.dataset.ios = "1";
+  }
+
+  installBtn.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (outcome === "accepted") installBtn.hidden = true;
+      return;
+    }
+    if (installBtn.dataset.ios) {
+      toast("Tocá Compartir → Añadir a inicio");
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    installBtn.hidden = true;
+    deferredPrompt = null;
+    toast("¡Instalada!");
+  });
 
   render();
 </script>
