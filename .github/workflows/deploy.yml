@@ -28,7 +28,19 @@ jobs:
         run: |
           COMMIT_SHA=$(git rev-parse --short HEAD)
           sed -i "s/<span id=\"version-tag\">dev<\/span>/<span id=\"version-tag\">${COMMIT_SHA}<\/span>/g" index.html
-          sed -i "s/const CACHE = \"atomic-dev\"/const CACHE = \"atomic-${COMMIT_SHA}\"/g" sw.js
+          sed -i "s/const CACHE = \"atomic-dev\"/const CACHE = \"atomic-${COMMIT_SHA}\"/g" public/sw.js
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
       
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -36,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' 
+          path: 'dist' 
       
       - name: Deploy to GitHub Pages
         id: deployment
