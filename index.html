@@ -913,6 +913,7 @@
         ? `🏁 Meta ${state.goal} en ${Math.max(0, goalDay - Math.max(dayIdx, 0))} día${(goalDay - Math.max(dayIdx, 0)) === 1 ? "" : "s"}`
         : target != null && target >= state.goal ? `🏆 ¡Meta alcanzada!` : null,
     ].filter(Boolean);
+    lines.push("", APP_URL);
     return lines.join("\n");
   }
 
