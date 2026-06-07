@@ -1,0 +1,43 @@
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Inject Commit Hash
+        run: |
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          sed -i "s/<span id=\"version-tag\">dev<\/span>/<span id=\"version-tag\">${COMMIT_SHA}<\/span>/g" index.html
+          sed -i "s/const CACHE = \"atomic-dev\"/const CACHE = \"atomic-${COMMIT_SHA}\"/g" sw.js
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' 
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
