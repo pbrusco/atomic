@@ -406,9 +406,36 @@
     openWelcome();
   }
 
+  function showUpdateBanner() {
+    const banner = $("updateBanner");
+    if (banner) {
+      banner.hidden = false;
+      const btn = $("updateBtn");
+      if (btn) {
+        btn.onclick = () => {
+          window.location.reload();
+        };
+      }
+    }
+  }
+
   if ("serviceWorker" in navigator) {
+    let hasControllerOnLoad = !!navigator.serviceWorker.controller;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hasControllerOnLoad) {
+        showUpdateBanner();
+      }
+      hasControllerOnLoad = true;
+    });
+
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
+      navigator.serviceWorker.register("sw.js").then((reg) => {
+        if (reg.waiting) {
+          showUpdateBanner();
+        }
+        reg.update().catch(() => {});
+      }).catch(() => {});
     });
   }
 
