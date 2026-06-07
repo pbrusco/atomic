@@ -90,7 +90,8 @@
       : `Día <b>${dayIdx + 1}</b> · ${goalDay + 1} en total`;
     $("goalText").innerHTML = `Meta <b>${state.goal}</b>`;
 
-    $("streak").textContent = currentStreak();
+    const streak = currentStreak();
+    $("streak").textContent = `${streak}${getStreakEmoji(streak, goalDay + 1)}`;
     $("total").textContent = Object.keys(state.completed).filter(k => state.completed[k]).length;
 
     renderDays(dayIdx);
@@ -147,6 +148,17 @@
     const d = new Date(startDate + "T00:00:00");
     d.setDate(d.getDate() + idx);
     return todayISO(d);
+  }
+
+  function getStreakEmoji(streak, totalDays) {
+    if (streak <= 0) return "";
+    const pct = totalDays > 0 ? streak / totalDays : 0;
+    if (pct >= 1.0) return " 🏆";
+    if (pct >= 0.75) return " 👑";
+    if (pct >= 0.5) return " 🚀";
+    if (pct >= 0.25) return " 💪";
+    if (pct >= 0.1) return " 🔥";
+    return " ⚡";
   }
 
   function currentStreak() {
