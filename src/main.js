@@ -406,13 +406,16 @@
     openWelcome();
   }
 
-  function showUpdateBanner() {
+  function showUpdateBanner(worker) {
     const banner = $("updateBanner");
     if (banner) {
       banner.hidden = false;
       const btn = $("updateBtn");
       if (btn) {
         btn.onclick = () => {
+          if (worker) {
+            worker.postMessage({ type: "SKIP_WAITING" });
+          }
           window.location.reload();
         };
       }
@@ -432,8 +435,20 @@
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js").then((reg) => {
         if (reg.waiting) {
-          showUpdateBanner();
+          showUpdateBanner(reg.waiting);
         }
+        
+        reg.addEventListener("updatefound", () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener("statechange", () => {
+              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                showUpdateBanner(newWorker);
+              }
+            });
+          }
+        });
+
         reg.update().catch(() => {});
       }).catch(() => {});
     });
