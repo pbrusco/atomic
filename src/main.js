@@ -143,21 +143,29 @@
     } catch { return null; }
   }
 
+  function dateForDayIdx(startDate, idx) {
+    const d = new Date(startDate + "T00:00:00");
+    d.setDate(d.getDate() + idx);
+    return todayISO(d);
+  }
+
   function currentStreak() {
     let n = 0;
-    const d = new Date();
-    const today = todayISO(d);
-    // Don't break the streak just because today isn't done yet:
-    // if today is unmarked, start counting from yesterday.
-    if (!state.completed[today]) d.setDate(d.getDate() - 1);
-    while (state.completed[todayISO(d)]) {
-      n++;
-      d.setDate(d.getDate() - 1);
+    const today = todayISO();
+    const dayIdx = daysBetween(state.startDate, today);
+    if (dayIdx < 0) return 0;
+
+    let startCheckIdx = dayIdx;
+    if (!state.completed[today]) {
+      startCheckIdx = dayIdx - 1;
     }
-    if (n === 0 && !state.completed[today]) {
-      const dayIdx = daysBetween(state.startDate, today);
-      if (dayIdx >= 0) {
-        return 1;
+
+    for (let i = startCheckIdx; i >= 0; i--) {
+      const k = dateForDayIdx(state.startDate, i);
+      if (state.completed[k]) {
+        n++;
+      } else {
+        break;
       }
     }
     return n;
