@@ -856,12 +856,19 @@
   function currentStreak() {
     let n = 0;
     const d = new Date();
+    const today = todayISO(d);
     // Don't break the streak just because today isn't done yet:
     // if today is unmarked, start counting from yesterday.
-    if (!state.completed[todayISO(d)]) d.setDate(d.getDate() - 1);
+    if (!state.completed[today]) d.setDate(d.getDate() - 1);
     while (state.completed[todayISO(d)]) {
       n++;
       d.setDate(d.getDate() - 1);
+    }
+    if (n === 0 && !state.completed[today]) {
+      const dayIdx = daysBetween(state.startDate, today);
+      if (dayIdx >= 0) {
+        return 1;
+      }
     }
     return n;
   }

@@ -1,4 +1,4 @@
-const CACHE = "atomic-v6";
+const CACHE = "atomic-v7";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-maskable.svg"];
 
 self.addEventListener("install", (e) => {
