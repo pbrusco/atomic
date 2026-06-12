@@ -534,21 +534,18 @@
       });
     }
 
+    let reloadScheduled = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (hasControllerOnLoad) {
+      if (hasControllerOnLoad && !reloadScheduled) {
+        reloadScheduled = true;
+        sessionStorage.setItem("just-updated", "1");
         if (document.hidden) {
-          sessionStorage.setItem("just-updated", "1");
           window.location.reload();
         } else {
           const banner = $("updateBanner");
           if (banner) {
             banner.hidden = false;
-            $("updateBtn").onclick = () => {
-              $("updateBtn").textContent = "Cargando…";
-              $("updateBtn").disabled = true;
-              sessionStorage.setItem("just-updated", "1");
-              window.location.reload();
-            };
+            $("updateBtn").onclick = () => window.location.reload();
             const oldVer = (sessionStorage.getItem("sw-version") || "atomic-dev").replace("atomic-", "");
             getSWVersion(navigator.serviceWorker.controller).then(newRaw => {
               const newVer = newRaw ? newRaw.replace("atomic-", "") : null;
@@ -556,6 +553,7 @@
               if (vEl && newVer) vEl.textContent = `${oldVer} → ${newVer}`;
             });
           }
+          setTimeout(() => window.location.reload(), 3000);
         }
       }
       hasControllerOnLoad = true;
