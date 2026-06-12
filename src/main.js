@@ -539,6 +539,8 @@
           if (banner) {
             banner.hidden = false;
             $("updateBtn").onclick = () => {
+              $("updateBtn").textContent = "Cargando…";
+              $("updateBtn").disabled = true;
               sessionStorage.setItem("just-updated", "1");
               window.location.reload();
             };
