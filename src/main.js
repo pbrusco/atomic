@@ -642,7 +642,15 @@
 
   function updateOfflineBanner() {
     const b = $("offlineBanner");
-    if (b) b.hidden = navigator.onLine;
+    if (!b) return;
+    if (!navigator.onLine && $("updateBanner").hidden) {
+      b.hidden = false;
+      clearTimeout(updateOfflineBanner._t);
+      updateOfflineBanner._t = setTimeout(() => { b.hidden = true; }, 5000);
+    } else {
+      clearTimeout(updateOfflineBanner._t);
+      b.hidden = true;
+    }
   }
   window.addEventListener("online", updateOfflineBanner);
   window.addEventListener("offline", updateOfflineBanner);
