@@ -90,6 +90,11 @@
     box-shadow: var(--shadow-md);
     animation: slideUp .3s ease;
   }
+  .update-info { display: flex; flex-direction: column; gap: 2px; }
+  .update-version {
+    font-size: 11px; opacity: 0.75; letter-spacing: .01em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
   .update-banner button {
     appearance: none;
     border: 0;

@@ -525,10 +525,15 @@
   if ("serviceWorker" in navigator) {
     let hasControllerOnLoad = !!navigator.serviceWorker.controller;
 
-    // Only show the banner after controllerchange — this fires once clients.claim()
-    // completes, meaning the new SW is definitively the controller before we reload.
-    // The statechange("installed") path fired too early (old SW still controller)
-    // and could reload into old content.
+    function getSWVersion(sw) {
+      return new Promise(resolve => {
+        const ch = new MessageChannel();
+        ch.port1.onmessage = e => resolve(e.data);
+        sw.postMessage("GET_VERSION", [ch.port2]);
+        setTimeout(() => resolve(null), 500);
+      });
+    }
+
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (hasControllerOnLoad) {
         if (document.hidden) {
@@ -544,6 +549,12 @@
               sessionStorage.setItem("just-updated", "1");
               window.location.reload();
             };
+            const oldVer = (sessionStorage.getItem("sw-version") || "atomic-dev").replace("atomic-", "");
+            getSWVersion(navigator.serviceWorker.controller).then(newRaw => {
+              const newVer = newRaw ? newRaw.replace("atomic-", "") : null;
+              const vEl = $("updateVersion");
+              if (vEl && newVer) vEl.textContent = `${oldVer} → ${newVer}`;
+            });
           }
         }
       }
@@ -552,7 +563,12 @@
 
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js")
-        .then((reg) => reg.update())
+        .then(reg => {
+          if (reg.active) getSWVersion(reg.active).then(v => {
+            if (v) sessionStorage.setItem("sw-version", v);
+          });
+          reg.update();
+        })
         .catch(() => {});
     });
   }
