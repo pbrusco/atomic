@@ -531,10 +531,18 @@
     // and could reload into old content.
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (hasControllerOnLoad) {
-        const banner = $("updateBanner");
-        if (banner) {
-          banner.hidden = false;
-          $("updateBtn").onclick = () => window.location.reload();
+        if (document.hidden) {
+          sessionStorage.setItem("just-updated", "1");
+          window.location.reload();
+        } else {
+          const banner = $("updateBanner");
+          if (banner) {
+            banner.hidden = false;
+            $("updateBtn").onclick = () => {
+              sessionStorage.setItem("just-updated", "1");
+              window.location.reload();
+            };
+          }
         }
       }
       hasControllerOnLoad = true;
@@ -626,6 +634,11 @@
   }
 
   scheduleNotifications();
+
+  if (sessionStorage.getItem("just-updated")) {
+    sessionStorage.removeItem("just-updated");
+    toast("Actualizado ✓");
+  }
 
   function updateOfflineBanner() {
     const b = $("offlineBanner");
