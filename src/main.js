@@ -61,6 +61,7 @@
     $("dateLabel").textContent = dayIdx < 0
       ? `Empieza en ${-dayIdx} día${-dayIdx === 1 ? "" : "s"}`
       : `Hoy te tocan`;
+    $("dateLabel").classList.toggle("pre-start", dayIdx < 0);
 
     const isBumpDay = dayIdx > 0 && dayIdx % state.everyDays === 0 && target < state.goal;
     $("target").classList.toggle("bumped", isBumpDay);
@@ -95,7 +96,7 @@
     $("streak").textContent = `${streak}${getStreakEmoji(streak, goalDay + 1)}`;
     $("total").textContent = Object.keys(state.completed).filter(k => state.completed[k]).length;
 
-    renderDays(dayIdx);
+    renderDays(dayIdx, streak);
 
     $("habit").value = state.habit;
     $("startDate").value = state.startDate;
@@ -193,10 +194,19 @@
     save(state);
   }
 
-  function renderDays(todayIdx) {
+  function renderDays(todayIdx, streak) {
     const root = $("days");
     root.innerHTML = "";
     const today = new Date();
+    const todayStr = todayISO();
+
+    let streakStart = null, streakEnd = null;
+    if (streak > 0) {
+      const endIdx = state.completed[todayStr] ? todayIdx : todayIdx - 1;
+      streakEnd = dateForDayIdx(state.startDate, endIdx);
+      streakStart = dateForDayIdx(state.startDate, endIdx - streak + 1);
+    }
+
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
@@ -207,6 +217,7 @@
       if (state.completed[k]) el.classList.add("done");
       if (i === 0) el.classList.add("today");
       if (idx < 0) el.classList.add("future");
+      if (streakStart && k >= streakStart && k <= streakEnd && state.completed[k]) el.classList.add("streak");
       const t = idx < 0 ? "—" : targetForDay(state, idx);
       el.title = idx < 0
         ? `${k} · sin empezar`
@@ -506,5 +517,13 @@
     deferredPrompt = null;
     toast("¡Instalada!");
   });
+
+  function updateOfflineBanner() {
+    const b = $("offlineBanner");
+    if (b) b.hidden = navigator.onLine;
+  }
+  window.addEventListener("online", updateOfflineBanner);
+  window.addEventListener("offline", updateOfflineBanner);
+  updateOfflineBanner();
 
   render();
