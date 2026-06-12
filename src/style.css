@@ -201,7 +201,7 @@
   .ring-wrap circle { fill: none; }
   .ring-track { stroke: var(--border); stroke-width: 6; }
   .ring-fill {
-    stroke: var(--accent);
+    stroke: url(#ringGrad) var(--accent);
     stroke-width: 8;
     stroke-linecap: round;
     transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1);
@@ -350,8 +350,8 @@
   .day.done::after {
     content: ""; position: absolute; inset: 0;
     background: var(--surface);
-    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/45% no-repeat;
-            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/45% no-repeat;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/38% no-repeat;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/38% no-repeat;
   }
   .day.today {
     box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--surface);
@@ -363,6 +363,16 @@
     .day.done:not(.future):hover { background: var(--accent-2); }
   }
   .day:not(.future):active { transform: scale(.88); }
+  .day-num {
+    position: absolute; top: 3px; left: 0; right: 0;
+    text-align: center; font-size: 9px; color: var(--muted);
+    font-weight: 500; pointer-events: none; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .day.done .day-num { color: rgba(255,255,255,.6); }
+  @media (prefers-color-scheme: dark) {
+    .day.done .day-num { color: rgba(0,0,0,.5); }
+  }
   .hint { color: var(--muted); font-size: 12px; margin-top: 12px; }
 
   /* ——— Settings ——— */

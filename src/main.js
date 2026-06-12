@@ -167,10 +167,15 @@
     ring.style.strokeDasharray = RING_CIRC.toFixed(3);
     ring.style.strokeDashoffset = (RING_CIRC * (1 - pct)).toFixed(3);
 
+    const doneCount = Object.keys(state.completed).filter(k => state.completed[k]).length;
     $("progressText").innerHTML = dayIdx < 0
       ? `Sin empezar`
-      : `Día <b>${dayIdx + 1}</b> · ${goalDay + 1} en total`;
-    $("goalText").innerHTML = `Meta <b>${state.goal}</b>`;
+      : dayIdx < goalDay
+        ? `Día <b>${dayIdx + 1}</b> de <b>${goalDay + 1}</b>`
+        : `Día <b>${dayIdx + 1}</b>`;
+    $("goalText").innerHTML = dayIdx >= 0 && doneCount > 0
+      ? `<b>${Math.round(doneCount / (dayIdx + 1) * 100)}%</b> completados`
+      : `Meta <b>${state.goal}</b>`;
 
     const streak = currentStreak();
     $("streak").textContent = `${streak}${getStreakEmoji(streak, goalDay + 1)}`;
@@ -303,6 +308,10 @@
         ? `${k} · sin empezar`
         : `${k} · meta ${t}${state.completed[k] ? " · hecho" : ""} · tocá para cambiar`;
       el.dataset.date = k;
+      const dayNum = document.createElement("span");
+      dayNum.className = "day-num";
+      dayNum.textContent = d.getDate();
+      el.appendChild(dayNum);
       el.addEventListener("click", () => {
         if (idx < 0) return;
         toggleDay(k);
@@ -400,7 +409,11 @@
     $("startDate").value = todayISO(d);
     renderPreview();
   });
-  $("startDate").addEventListener("input", renderPreview);
+  $("startDate").addEventListener("input", () => {
+    const v = $("startDate").value;
+    if (v) $("daysAgo").value = Math.max(0, daysBetween(v, todayISO()));
+    renderPreview();
+  });
   ["habit","startAmt","increment","everyDays","goal"].forEach(id => {
     $(id).addEventListener("input", renderPreview);
   });
