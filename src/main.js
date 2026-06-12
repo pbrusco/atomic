@@ -62,7 +62,7 @@
       ? `Empieza en ${-dayIdx} día${-dayIdx === 1 ? "" : "s"}`
       : `Hoy te tocan`;
 
-    const isBumpDay = dayIdx >= 0 && dayIdx % state.everyDays === 0 && dayIdx > 0 && target < state.goal;
+    const isBumpDay = dayIdx > 0 && dayIdx % state.everyDays === 0 && target < state.goal;
     $("target").classList.toggle("bumped", isBumpDay);
 
     if (dayIdx < 0) {
@@ -78,8 +78,9 @@
     const btn = $("doneBtn");
     btn.textContent = isDone ? "Hecho hoy" : `Marcar hoy como hecho`;
     btn.classList.toggle("done", isDone);
+    btn.disabled = dayIdx < 0;
 
-    const pct = goalDay > 0 ? Math.min(1, Math.max(0, Math.max(dayIdx, 0) / goalDay)) : 1;
+    const pct = goalDay > 0 ? Math.min(1, Math.max(dayIdx, 0) / goalDay) : 1;
     const ring = $("ringFill");
     ring.style.setProperty("--ring-circ", RING_CIRC);
     ring.style.strokeDasharray = RING_CIRC.toFixed(3);
@@ -183,6 +184,15 @@
     return n;
   }
 
+  function toggleDay(k) {
+    if (state.completed[k]) {
+      delete state.completed[k];
+    } else {
+      state.completed[k] = true;
+    }
+    save(state);
+  }
+
   function renderDays(todayIdx) {
     const root = $("days");
     root.innerHTML = "";
@@ -198,12 +208,13 @@
       if (i === 0) el.classList.add("today");
       if (idx < 0) el.classList.add("future");
       const t = idx < 0 ? "—" : targetForDay(state, idx);
-      el.title = `${k} · meta ${t}${state.completed[k] ? " · hecho" : ""} · tocá para cambiar`;
+      el.title = idx < 0
+        ? `${k} · sin empezar`
+        : `${k} · meta ${t}${state.completed[k] ? " · hecho" : ""} · tocá para cambiar`;
       el.dataset.date = k;
       el.addEventListener("click", () => {
         if (idx < 0) return;
-        state.completed[k] = !state.completed[k];
-        save(state);
+        toggleDay(k);
         toast(state.completed[k] ? `Registrado ${k}` : `Desmarcado ${k}`);
         render();
       });
@@ -223,12 +234,12 @@
     const lines = [
       `⚡ Mi progreso con *${state.habit}*`,
       `📅 ${dayLabel}`,
-      target != null ? `🎯 Hoy: ${target} ${habit}` : null,
+      `🎯 Hoy: ${target} ${habit}`,
       `🔥 Racha: ${streak} día${streak === 1 ? "" : "s"}`,
       `✅ Total: ${total}`,
-      target != null && target < state.goal && goalDay > 0
+      target < state.goal && goalDay > 0
         ? `🏁 Meta ${state.goal} en ${Math.max(0, goalDay - Math.max(dayIdx, 0))} día${(goalDay - Math.max(dayIdx, 0)) === 1 ? "" : "s"}`
-        : target != null && target >= state.goal ? `🏆 ¡Meta alcanzada!` : null,
+        : target >= state.goal ? `🏆 ¡Meta alcanzada!` : null,
     ].filter(Boolean);
     lines.push("", APP_URL);
     return lines.join("\n");
@@ -271,13 +282,13 @@
   $("shareRoutineBtn").addEventListener("click", () => openWhatsApp(buildRoutineMessage()));
 
   $("doneBtn").addEventListener("click", () => {
-    const k = todayISO();
-    state.completed[k] = !state.completed[k];
-    save(state);
+    const today = todayISO();
+    if (daysBetween(state.startDate, today) < 0) return;
+    toggleDay(today);
     const btn = $("doneBtn");
     btn.classList.add("pop-anim");
     setTimeout(() => btn.classList.remove("pop-anim"), 350);
-    toast(state.completed[k] ? "¡Listo!" : "Desmarcado");
+    toast(state.completed[today] ? "¡Listo!" : "Desmarcado");
     render();
   });
 
@@ -334,9 +345,10 @@
   $("resetBtn").addEventListener("click", () => {
     if (!confirm("¿Borrar todos los datos y ajustes?")) return;
     localStorage.removeItem(KEY);
-    state = load();
+    state = { ...DEFAULTS, startDate: todayISO(), completed: {} };
     save(state);
     toast("Borrado");
+    openWelcome();
     render();
   });
 
