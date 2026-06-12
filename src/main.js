@@ -1,4 +1,6 @@
   const KEY = "atomic-habit-v1";
+  const NOTIF_KEY = "atomic-notif-v1";
+  const NOTIF_DEFAULTS = { enabled: false, morningTime: "08:00", eveningTime: "21:00" };
   const DEFAULTS = {
     habit: "Flexiones",
     startDate: todayISO(),
@@ -37,6 +39,84 @@
     } catch { return { ...DEFAULTS }; }
   }
   function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+  function loadNotifSettings() {
+    try {
+      const raw = localStorage.getItem(NOTIF_KEY);
+      return raw ? { ...NOTIF_DEFAULTS, ...JSON.parse(raw) } : { ...NOTIF_DEFAULTS };
+    } catch { return { ...NOTIF_DEFAULTS }; }
+  }
+  function saveNotifSettings(n) { localStorage.setItem(NOTIF_KEY, JSON.stringify(n)); }
+
+  let notifSettings = loadNotifSettings();
+  let _notifTimers = [];
+
+  function clearNotifTimers() {
+    _notifTimers.forEach(clearTimeout);
+    _notifTimers = [];
+  }
+
+  function showNotif(title, body, tag) {
+    if (Notification.permission !== "granted") return;
+    navigator.serviceWorker?.ready.then(reg => {
+      reg.showNotification(title, { body, icon: "./icon.svg", badge: "./icon.svg", tag });
+    }).catch(() => {
+      try { new Notification(title, { body, icon: "./icon.svg" }); } catch {}
+    });
+  }
+
+  function scheduleNotifications() {
+    clearNotifTimers();
+    if (!notifSettings.enabled || Notification.permission !== "granted") return;
+
+    const today = todayISO();
+    const dayIdx = daysBetween(state.startDate, today);
+    if (dayIdx < 0) return;
+
+    const target = targetForDay(state, dayIdx);
+    const now = new Date();
+
+    const [mh, mm] = notifSettings.morningTime.split(":").map(Number);
+    const morning = new Date(); morning.setHours(mh, mm, 0, 0);
+    const msToMorning = morning - now;
+    if (msToMorning > 0) {
+      _notifTimers.push(setTimeout(() => {
+        showNotif(
+          `⚡ ${target} ${state.habit.toLowerCase()} hoy`,
+          `Día ${dayIdx + 1} de tu hábito. ¡A por ello!`,
+          "atomic-morning"
+        );
+      }, msToMorning));
+    }
+
+    const [eh, em] = notifSettings.eveningTime.split(":").map(Number);
+    const evening = new Date(); evening.setHours(eh, em, 0, 0);
+    const msToEvening = evening - now;
+    if (msToEvening > 0) {
+      _notifTimers.push(setTimeout(() => {
+        if (!state.completed[todayISO()]) {
+          showNotif(
+            `⚡ ¿Hiciste tus ${state.habit.toLowerCase()}?`,
+            `Todavía no marcaste el hábito de hoy. ¡Quedan ${target}!`,
+            "atomic-evening"
+          );
+        }
+      }, msToEvening));
+    }
+  }
+
+  function renderNotifUI() {
+    const el = $("notifEnabled");
+    if (!el) return;
+    el.checked = notifSettings.enabled && Notification.permission === "granted";
+    $("notifTimes").hidden = !el.checked;
+    $("notifMorning").value = notifSettings.morningTime;
+    $("notifEvening").value = notifSettings.eveningTime;
+    const hint = $("notifHint");
+    if (hint) hint.textContent = Notification.permission === "denied"
+      ? "Permiso denegado. Activalo en la configuración del navegador."
+      : "Funciona mejor con la app instalada en tu pantalla de inicio.";
+  }
 
   function toast(msg) {
     const t = $("toast");
@@ -494,6 +574,45 @@
     deferredPrompt = null;
     toast("¡Instalada!");
   });
+
+  if ("Notification" in window) {
+    renderNotifUI();
+
+    $("notifEnabled").addEventListener("change", async () => {
+      const el = $("notifEnabled");
+      if (el.checked) {
+        if (Notification.permission !== "granted") {
+          const perm = await Notification.requestPermission();
+          if (perm !== "granted") {
+            el.checked = false;
+            renderNotifUI();
+            return;
+          }
+        }
+        notifSettings.enabled = true;
+      } else {
+        notifSettings.enabled = false;
+        clearNotifTimers();
+      }
+      saveNotifSettings(notifSettings);
+      $("notifTimes").hidden = !notifSettings.enabled;
+      if (notifSettings.enabled) scheduleNotifications();
+    });
+
+    ["notifMorning", "notifEvening"].forEach(id => {
+      $(id).addEventListener("change", () => {
+        notifSettings.morningTime = $("notifMorning").value;
+        notifSettings.eveningTime = $("notifEvening").value;
+        saveNotifSettings(notifSettings);
+        scheduleNotifications();
+      });
+    });
+  } else {
+    const s = $("notifSection");
+    if (s) s.hidden = true;
+  }
+
+  scheduleNotifications();
 
   function updateOfflineBanner() {
     const b = $("offlineBanner");

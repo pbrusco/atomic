@@ -146,6 +146,32 @@
       </div>
       <button class="save" id="saveBtn">Guardar ajustes</button>
 
+      <div class="notif-section" id="notifSection">
+        <div class="notif-header">
+          <div>
+            <div class="notif-title">Notificaciones</div>
+            <div class="notif-desc">Recordatorio mañana + tarde</div>
+          </div>
+          <label class="toggle-switch" aria-label="Activar notificaciones">
+            <input type="checkbox" id="notifEnabled" />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div id="notifTimes" hidden>
+          <div class="row" style="margin-top: 0;">
+            <div class="field">
+              <label for="notifMorning">Mañana (meta del día)</label>
+              <input id="notifMorning" type="time" />
+            </div>
+            <div class="field">
+              <label for="notifEvening">Tarde (si no hiciste)</label>
+              <input id="notifEvening" type="time" />
+            </div>
+          </div>
+          <div class="field-hint" id="notifHint"></div>
+        </div>
+      </div>
+
       <div class="field full" style="margin-top: 22px;">
         <label>Copia de seguridad</label>
         <textarea id="backup" placeholder="Pegá una copia acá para restaurar"></textarea>
