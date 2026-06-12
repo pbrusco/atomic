@@ -429,51 +429,28 @@
     openWelcome();
   }
 
-  function showUpdateBanner(worker) {
-    const banner = $("updateBanner");
-    if (banner) {
-      banner.hidden = false;
-      const btn = $("updateBtn");
-      if (btn) {
-        btn.onclick = () => {
-          if (worker) {
-            worker.postMessage({ type: "SKIP_WAITING" });
-          }
-          window.location.reload();
-        };
-      }
-    }
-  }
-
   if ("serviceWorker" in navigator) {
     let hasControllerOnLoad = !!navigator.serviceWorker.controller;
 
+    // Only show the banner after controllerchange — this fires once clients.claim()
+    // completes, meaning the new SW is definitively the controller before we reload.
+    // The statechange("installed") path fired too early (old SW still controller)
+    // and could reload into old content.
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (hasControllerOnLoad) {
-        showUpdateBanner();
+        const banner = $("updateBanner");
+        if (banner) {
+          banner.hidden = false;
+          $("updateBtn").onclick = () => window.location.reload();
+        }
       }
       hasControllerOnLoad = true;
     });
 
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").then((reg) => {
-        if (reg.waiting) {
-          showUpdateBanner(reg.waiting);
-        }
-        
-        reg.addEventListener("updatefound", () => {
-          const newWorker = reg.installing;
-          if (newWorker) {
-            newWorker.addEventListener("statechange", () => {
-              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                showUpdateBanner(newWorker);
-              }
-            });
-          }
-        });
-
-        reg.update().catch(() => {});
-      }).catch(() => {});
+      navigator.serviceWorker.register("sw.js")
+        .then((reg) => reg.update())
+        .catch(() => {});
     });
   }
 
