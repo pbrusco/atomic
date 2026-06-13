@@ -310,7 +310,7 @@
       el.dataset.date = k;
       const dayNum = document.createElement("span");
       dayNum.className = "day-num";
-      dayNum.textContent = d.getDate();
+      dayNum.textContent = `${d.getDate()}/${d.getMonth() + 1}`;
       el.appendChild(dayNum);
       el.addEventListener("click", () => {
         if (idx < 0) return;
