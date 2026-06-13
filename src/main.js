@@ -524,56 +524,23 @@
 
   if ("serviceWorker" in navigator) {
     let hasControllerOnLoad = !!navigator.serviceWorker.controller;
-
-    function getSWVersion(sw) {
-      return new Promise(resolve => {
-        const ch = new MessageChannel();
-        ch.port1.onmessage = e => resolve(e.data);
-        sw.postMessage("GET_VERSION", [ch.port2]);
-        setTimeout(() => resolve(null), 500);
-      });
-    }
-
     let reloadScheduled = false;
+
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hasControllerOnLoad) { hasControllerOnLoad = true; return; }
       if (reloadScheduled) return;
-      // Don't show banner again if user already clicked update in the last 30s
-      const lastClick = parseInt(sessionStorage.getItem("update-clicked-at") || "0");
-      if (Date.now() - lastClick < 30000) return;
       reloadScheduled = true;
+      sessionStorage.setItem("just-updated", "1");
       if (document.hidden) {
-        sessionStorage.setItem("just-updated", "1");
         window.location.reload();
       } else {
-        const banner = $("updateBanner");
-        if (banner) {
-          banner.hidden = false;
-          $("updateBtn").onclick = () => {
-            $("updateBtn").textContent = "Cargando…";
-            $("updateBtn").disabled = true;
-            sessionStorage.setItem("update-clicked-at", String(Date.now()));
-            sessionStorage.setItem("just-updated", "1");
-            window.location.reload();
-          };
-          const oldVer = (sessionStorage.getItem("sw-version") || "atomic-dev").replace("atomic-", "");
-          getSWVersion(navigator.serviceWorker.controller).then(newRaw => {
-            const newVer = newRaw ? newRaw.replace("atomic-", "") : null;
-            const vEl = $("updateVersion");
-            if (vEl && newVer) vEl.textContent = `${oldVer} → ${newVer}`;
-          });
-        }
+        toast("Actualizado ✓");
       }
     });
 
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js")
-        .then(reg => {
-          if (reg.active) getSWVersion(reg.active).then(v => {
-            if (v) sessionStorage.setItem("sw-version", v);
-          });
-          reg.update();
-        })
+        .then(reg => reg.update())
         .catch(() => {});
     });
   }
@@ -657,11 +624,5 @@
   }
 
   scheduleNotifications();
-
-  if (sessionStorage.getItem("just-updated")) {
-    sessionStorage.removeItem("just-updated");
-    toast("Actualizado ✓");
-  }
-
 
   render();
