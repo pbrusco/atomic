@@ -536,27 +536,34 @@
 
     let reloadScheduled = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (hasControllerOnLoad && !reloadScheduled) {
-        reloadScheduled = true;
+      if (!hasControllerOnLoad) { hasControllerOnLoad = true; return; }
+      if (reloadScheduled) return;
+      // Don't show banner again if user already clicked update in the last 30s
+      const lastClick = parseInt(sessionStorage.getItem("update-clicked-at") || "0");
+      if (Date.now() - lastClick < 30000) return;
+      reloadScheduled = true;
+      if (document.hidden) {
         sessionStorage.setItem("just-updated", "1");
-        if (document.hidden) {
-          window.location.reload();
-        } else {
-          const banner = $("updateBanner");
-          if (banner) {
-            banner.hidden = false;
-            $("updateBtn").onclick = () => window.location.reload();
-            const oldVer = (sessionStorage.getItem("sw-version") || "atomic-dev").replace("atomic-", "");
-            getSWVersion(navigator.serviceWorker.controller).then(newRaw => {
-              const newVer = newRaw ? newRaw.replace("atomic-", "") : null;
-              const vEl = $("updateVersion");
-              if (vEl && newVer) vEl.textContent = `${oldVer} → ${newVer}`;
-            });
-          }
-          setTimeout(() => window.location.reload(), 3000);
+        window.location.reload();
+      } else {
+        const banner = $("updateBanner");
+        if (banner) {
+          banner.hidden = false;
+          $("updateBtn").onclick = () => {
+            $("updateBtn").textContent = "Cargando…";
+            $("updateBtn").disabled = true;
+            sessionStorage.setItem("update-clicked-at", String(Date.now()));
+            sessionStorage.setItem("just-updated", "1");
+            window.location.reload();
+          };
+          const oldVer = (sessionStorage.getItem("sw-version") || "atomic-dev").replace("atomic-", "");
+          getSWVersion(navigator.serviceWorker.controller).then(newRaw => {
+            const newVer = newRaw ? newRaw.replace("atomic-", "") : null;
+            const vEl = $("updateVersion");
+            if (vEl && newVer) vEl.textContent = `${oldVer} → ${newVer}`;
+          });
         }
       }
-      hasControllerOnLoad = true;
     });
 
     window.addEventListener("load", () => {
